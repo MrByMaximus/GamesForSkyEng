@@ -11,6 +11,7 @@ RECT_WIDTH, RECT_HEIGHT = 100, 150
 
 # Позиции
 RECT_POS_X, RECT_POS_Y = 20, (MAX_HEIGHT // 2) - 75
+FONT_POS_Y = RECT_POS_Y + (RECT_HEIGHT // 3)
 
 #Кол-во прямоугольников
 RECT_COUNT = 4
@@ -58,8 +59,11 @@ if __name__ == '__main__':
                     isRunning = False
 
         # Отрисовка элементов
-        for rect in rects:
-            pg.draw.rect(window, YELLOW, rect)
-        window.blit(source=caption, dest=(25, 25))
+        
+        for i in range(1, RECT_COUNT+1):
+            pg.draw.rect(window, YELLOW, rects[i-1])
+            window.blit(source=caption, dest=(
+                (RECT_WIDTH*(i-1) + RECT_POS_X*i) + 10,
+                FONT_POS_Y))
 
         pg.display.update()
