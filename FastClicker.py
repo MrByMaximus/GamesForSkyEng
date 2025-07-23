@@ -1,3 +1,4 @@
+import time
 import pygame as pg
 
 # Цвета
@@ -23,9 +24,14 @@ class Area(pg.Rect):
     def __init__(self, x = RECT_POS_X, y = RECT_POS_Y, width = RECT_WIDTH, height = RECT_HEIGHT):
         self = super().__init__(x, y, width, height)
 
-class Font(Area):
-    def __init__():
-        ...
+# class Font(pg.font.Font):
+#     def __init__(self, name = 'times new roman', size = SIZE_FONT):
+#         # self = pg.font.SysFont(name, size)
+#         font = super().__init__(None, size)
+#         self = font.render()
+
+#     def render_text(self, text):
+#         self.render(text, True, TEXT_COLOR, None)
 
 if __name__ == '__main__':
     pg.init()
@@ -44,12 +50,15 @@ if __name__ == '__main__':
         rects.append(Area(x=RECT_WIDTH*(i-1) + RECT_POS_X*i))
 
     # Настройки шрифта
+    # main_font = Font()
     main_font = pg.font.SysFont('times new roman', SIZE_FONT)
-    caption = main_font.render('Попал', True, TEXT_COLOR, None)
+    other_font = pg.font.Font(None, SIZE_FONT+10)
+    catch_text = main_font.render('Попал', True, TEXT_COLOR, None)
+    click_text = other_font.render('CLICK', True, TEXT_COLOR, None)
 
     # Игровой цикл
     isRunning = True
-
+    
     while isRunning:
         for event in pg.event.get():
             if event.type == pg.QUIT:
@@ -62,7 +71,7 @@ if __name__ == '__main__':
         
         for i in range(1, RECT_COUNT+1):
             pg.draw.rect(window, YELLOW, rects[i-1])
-            window.blit(source=caption, dest=(
+            window.blit(source=catch_text, dest=(
                 (RECT_WIDTH*(i-1) + RECT_POS_X*i) + 10,
                 FONT_POS_Y))
 
