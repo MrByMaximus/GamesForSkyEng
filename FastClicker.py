@@ -1,5 +1,5 @@
-import time
 import pygame as pg
+from random import randint
 
 # Цвета
 LIGHT_BLUE = (127, 79, 194)
@@ -14,11 +14,14 @@ RECT_WIDTH, RECT_HEIGHT = 100, 150
 RECT_POS_X, RECT_POS_Y = 20, (MAX_HEIGHT // 2) - 75
 FONT_POS_Y = RECT_POS_Y + (RECT_HEIGHT // 3)
 
-#Кол-во прямоугольников
+# Кол-во прямоугольников
 RECT_COUNT = 4
 
-#Настройки шрифта
+# Настройки шрифта
 SIZE_FONT = 30
+
+# Задержка
+DELAY = 1000
 
 class Area(pg.Rect):
     def __init__(self, x = RECT_POS_X, y = RECT_POS_Y, width = RECT_WIDTH, height = RECT_HEIGHT):
@@ -58,7 +61,9 @@ if __name__ == '__main__':
 
     # Игровой цикл
     isRunning = True
-    
+    last_ticks = pg.time.get_ticks()
+    num = 1
+
     while isRunning:
         for event in pg.event.get():
             if event.type == pg.QUIT:
@@ -67,12 +72,19 @@ if __name__ == '__main__':
                 if event.key == pg.K_ESCAPE:
                     isRunning = False
 
-        # Отрисовка элементов
-        
+        # Отрисовка прямоугольников
         for i in range(1, RECT_COUNT+1):
             pg.draw.rect(window, YELLOW, rects[i-1])
-            window.blit(source=catch_text, dest=(
-                (RECT_WIDTH*(i-1) + RECT_POS_X*i) + 10,
-                FONT_POS_Y))
 
+        # Отрисовка текста
+        now_ticks = pg.time.get_ticks()
+        if now_ticks - last_ticks >= DELAY:
+            num = randint(1, RECT_COUNT)
+            last_ticks = now_ticks
+        
+        window.blit(source=click_text, dest=(
+            (RECT_WIDTH*(num-1) + RECT_POS_X*num) + 10,
+            FONT_POS_Y))
+
+        # pg.time.delay(DELAY * 1000)
         pg.display.update()
