@@ -23,9 +23,12 @@ SIZE_FONT = 30
 # Задержка
 DELAY = 1000
 
-class Area(pg.Rect):
+class Area():
     def __init__(self, x = RECT_POS_X, y = RECT_POS_Y, width = RECT_WIDTH, height = RECT_HEIGHT):
-        self = super().__init__(x, y, width, height)
+        self.rect = pg.Rect(x, y, width, height)
+
+    def collidepoint(self, x, y):
+        return self.rect.collidepoint(x, y)
 
 # class Font(pg.font.Font):
 #     def __init__(self, name = 'times new roman', size = SIZE_FONT):
@@ -71,10 +74,16 @@ if __name__ == '__main__':
             elif event.type == pg.KEYDOWN:
                 if event.key == pg.K_ESCAPE:
                     isRunning = False
+            elif event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
+                x, y = event.pos
+                for i in range(1, RECT_COUNT+1):
+                    if rects[i-1].collidepoint(x, y) and i == num:
+                        print("Попал")
+                        break
 
         # Отрисовка прямоугольников
         for i in range(1, RECT_COUNT+1):
-            pg.draw.rect(window, YELLOW, rects[i-1])
+            pg.draw.rect(window, YELLOW, rects[i-1].rect)
 
         # Отрисовка текста
         now_ticks = pg.time.get_ticks()
@@ -86,5 +95,4 @@ if __name__ == '__main__':
             (RECT_WIDTH*(num-1) + RECT_POS_X*num) + 10,
             FONT_POS_Y))
 
-        # pg.time.delay(DELAY * 1000)
         pg.display.update()
