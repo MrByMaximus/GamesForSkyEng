@@ -68,9 +68,23 @@ def main():
     isRunning = True
     isClicked: bool | None = None
 
-    last_ticks = pg.time.get_ticks()
-    num = 1
-    card_clicked = 1
+    # Последний зафиксированный тик (в мс)
+    last_ticks: int = pg.time.get_ticks()
+
+    # Номер прямоугольника, где появляется надпись
+    num: int = 1
+
+    # Номер прямоугольника, по которому кликнули
+    card_clicked: int = 1
+
+    # Текущий текст отрисовки
+    text: pg.Surface = click_text
+
+    # Счетчик игры
+    points: int = 0
+
+    # Таймер игры
+    timer: int = 20
 
     while isRunning:
         for event in pg.event.get():
@@ -79,12 +93,15 @@ def main():
             elif event.type == pg.KEYDOWN:
                 if event.key == pg.K_ESCAPE:
                     isRunning = False
+            # Проверка нажатия левой кнопки мыши
             elif event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
                 x, y = event.pos
                 for i in range(1, RECT_COUNT+1):
                     if rects[i-1].collidepoint(x, y):
                         if i == num:
                             isClicked = True
+                            text = catch_text
+                            points += 1
                         else:
                             isClicked = False
                         card_clicked = i
@@ -93,26 +110,28 @@ def main():
         # Отрисовка прямоугольников
         for i in range(1, RECT_COUNT+1):
             color = YELLOW
-            if i == card_clicked:
+            if i == card_clicked and isClicked != None:
                 if isClicked == True:
                     color = GREEN
-                if isClicked == False:
+                elif isClicked == False:
                     color = RED
             
             pg.draw.rect(window, color, rects[i-1].rect)
+
+        # Отрисовка текста
+        window.blit(source=text, dest=(
+            (RECT_WIDTH*(num-1) + RECT_POS_X*num) + 10,
+            FONT_POS_Y))
 
         # Генерация текста в прямоугольнике
         now_ticks = pg.time.get_ticks()
         if now_ticks - last_ticks >= DELAY:
             num = randint(1, RECT_COUNT)
             last_ticks = now_ticks
+            timer -= 1
             if isClicked != None:
                 isClicked = None
-        
-        # Отрисовка текста
-        window.blit(source=click_text, dest=(
-            (RECT_WIDTH*(num-1) + RECT_POS_X*num) + 10,
-            FONT_POS_Y))
+                text = click_text
 
         pg.display.update()
 
