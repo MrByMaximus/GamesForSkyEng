@@ -57,12 +57,22 @@ def main():
     for i in range(1, RECT_COUNT+1):
         rects.append(Area(x=RECT_WIDTH*(i-1) + RECT_POS_X*i))
 
+    # Счетчик игры
+    points: int = 0
+
+    # Таймер игры
+    timer: int = 20
+
     # Настройки шрифта
     # main_font = Font()
     main_font = pg.font.SysFont('times new roman', SIZE_FONT)
     other_font = pg.font.Font(None, SIZE_FONT+10)
     catch_text = main_font.render('Попал', True, TEXT_COLOR, None)
     click_text = other_font.render('CLICK', True, TEXT_COLOR, None)
+    timer_text = main_font.render('Таймер:', True, TEXT_COLOR, None)
+    points_text = main_font.render('Счёт:', True, TEXT_COLOR, None)
+    timer_value_text = main_font.render(str(timer), True, TEXT_COLOR, None)
+    points_value_text = main_font.render(str(points), True, TEXT_COLOR, None)
 
     # Игровой цикл
     isRunning = True
@@ -79,12 +89,6 @@ def main():
 
     # Текущий текст отрисовки
     text: pg.Surface = click_text
-
-    # Счетчик игры
-    points: int = 0
-
-    # Таймер игры
-    timer: int = 20
 
     while isRunning:
         for event in pg.event.get():
@@ -122,13 +126,24 @@ def main():
         window.blit(source=text, dest=(
             (RECT_WIDTH*(num-1) + RECT_POS_X*num) + 10,
             FONT_POS_Y))
+        window.blit(timer_text, (20, 15))
+        window.blit(points_text, (MAX_WIDTH-100, 15))
+        window.blit(timer_value_text, (50, 45))
+        window.blit(points_value_text, (MAX_WIDTH-75, 45))
 
         # Генерация текста в прямоугольнике
         now_ticks = pg.time.get_ticks()
         if now_ticks - last_ticks >= DELAY:
             num = randint(1, RECT_COUNT)
             last_ticks = now_ticks
+
+            # Изменение таймера
             timer -= 1
+            timer_value_text = main_font.render(str(timer), True, TEXT_COLOR, None)
+
+            # Очистка экрана
+            window.fill(LIGHT_BLUE)
+
             if isClicked != None:
                 isClicked = None
                 text = click_text
