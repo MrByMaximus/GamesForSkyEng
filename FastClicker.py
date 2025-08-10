@@ -61,21 +61,25 @@ def main():
     points: int = 0
 
     # Таймер игры
-    timer: int = 20
+    timer: int = 5
 
     # Настройки шрифта
     # main_font = Font()
     main_font = pg.font.SysFont('times new roman', SIZE_FONT)
     other_font = pg.font.Font(None, SIZE_FONT+10)
+    
     catch_text = main_font.render('Попал', True, TEXT_COLOR, None)
     click_text = other_font.render('CLICK', True, TEXT_COLOR, None)
+
     timer_text = main_font.render('Таймер:', True, TEXT_COLOR, None)
     points_text = main_font.render('Счёт:', True, TEXT_COLOR, None)
+
     timer_value_text = main_font.render(str(timer), True, TEXT_COLOR, None)
     points_value_text = main_font.render(str(points), True, TEXT_COLOR, None)
 
     # Игровой цикл
     isRunning = True
+    isGameOver = False
     isClicked: bool | None = None
 
     # Последний зафиксированный тик (в мс)
@@ -84,11 +88,11 @@ def main():
     # Номер прямоугольника, где появляется надпись
     num: int = 1
 
-    # Номер прямоугольника, по которому кликнули
-    card_clicked: int = 1
-
     # Текущий текст отрисовки
     text: pg.Surface = click_text
+
+    # Номер прямоугольника, по которому кликнули
+    card_clicked: int = 1
 
     while isRunning:
         for event in pg.event.get():
@@ -98,17 +102,28 @@ def main():
                 if event.key == pg.K_ESCAPE:
                     isRunning = False
             # Проверка нажатия левой кнопки мыши
-            elif event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
+            elif event.type == pg.MOUSEBUTTONDOWN and event.button == 1 and not isGameOver:
                 x, y = event.pos
+                # Проверка, что нажали на прямоугольник
                 for i in range(1, RECT_COUNT+1):
                     if rects[i-1].collidepoint(x, y):
-                        if i == num:
+                        if i == num: # Попали
                             isClicked = True
                             text = catch_text
                             points += 1
-                        else:
+                        else: # Промазали
                             isClicked = False
+                            points -= 1
+                            if points < 0:
+                                points = 0
+
+                        # Очистка экрана
+                        window.fill(LIGHT_BLUE)
+                        
+                        # Изменение текста счетчика
+                        points_value_text = main_font.render(str(points), True, TEXT_COLOR, None)
                         card_clicked = i
+
                         break
 
         # Отрисовка прямоугольников
@@ -131,22 +146,25 @@ def main():
         window.blit(timer_value_text, (50, 45))
         window.blit(points_value_text, (MAX_WIDTH-75, 45))
 
-        # Генерация текста в прямоугольнике
+        # Проверка что прошла секунда
         now_ticks = pg.time.get_ticks()
-        if now_ticks - last_ticks >= DELAY:
+        if now_ticks - last_ticks >= DELAY and not isGameOver:
             num = randint(1, RECT_COUNT)
             last_ticks = now_ticks
+
+            if isClicked != None:
+                isClicked = None
+                text = click_text
+            
+            # Очистка экрана
+            window.fill(LIGHT_BLUE)
 
             # Изменение таймера
             timer -= 1
             timer_value_text = main_font.render(str(timer), True, TEXT_COLOR, None)
 
-            # Очистка экрана
-            window.fill(LIGHT_BLUE)
-
-            if isClicked != None:
-                isClicked = None
-                text = click_text
+            if timer <= 0:
+                isGameOver = True
 
         pg.display.update()
 
